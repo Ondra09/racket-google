@@ -45,6 +45,7 @@
                                          ['auth_uri auth-uri]
                                          ['token_uri token-uri]
                                          ['client_secret secret]
+                                         ['project_id proj-id]
                                          _ ...)])
     (string->jsexpr json-blob))
   (client id secret auth-uri token-uri))
@@ -66,13 +67,14 @@
 ;; [#:login-hint (Option String)] ;; email address, if present
 ;; [#:include-granted-scopes? Boolean]
 ;; -> UrlString
+;; https://developers.google.com/identity/protocols/oauth2/native-app
 (define (authentication-request-url c scopes
                                     #:state [state #f]
                                     #:login-hint [login-hint #f]
                                     #:include-granted-scopes? [include-granted-scopes? #f])
   (let* ((fields (list (cons 'response_type "code")
                        (cons 'client_id (client-id c))
-                       (cons 'redirect_uri "urn:ietf:wg:oauth:2.0:oob")
+                       (cons 'redirect_uri "urn:ietf:wg:oauth:2.0:oob") ;; manual copy-paste or programmatic extraction urn:ietf:wg:oauth:2.0:oob:auto
                        (cons 'scope (string-join scopes))))
          (fields (if state (cons (cons 'state state) fields) fields))
          (fields (if login-hint (cons (cons 'login_hint login-hint) fields) fields))

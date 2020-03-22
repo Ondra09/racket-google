@@ -7,7 +7,8 @@
   (require google/drive)
   (require google/simple-token-store)
   (require racket/pretty)
-
+  (require webapi/oauth2)
+  (require google/calendar)
   ;; Download client_secret.json from your application's credentials
   ;; console, https://console.developers.google.com/
   (define c (file->client "client_secret.json"))
@@ -17,6 +18,7 @@
   ;; (which is where lookup-google-token gets it from).
   (define t (lookup-google-token c))
 
+  (printf "Token ~a\n" t)
   (with-handlers [(exn:fail:google?
                    (lambda (e)
                      ;; Printing the exception shows all of the detail
@@ -44,19 +46,20 @@
                             new-token)
                           #f))))
 
-      (pretty-print (get-profile #:token t))
+      (pretty-print (list-events #:token t))
+      ;;(pretty-print (get-profile #:token t))
 
-      (let ((r (drive-list #:token t
-                           #:query `(in "root" parents))))
-        (for [(item (@ r items))]
-          (printf " - ~a: ~a\n" (@ item title) (@ item id))
-          ;; (for [(parent (@ item parents))]
-          ;;   (printf "    - ~a\n" (@ parent id)))
-          ;; (for [(kid (@ (drive-list #:token t #:query `(in ,(@ item id) parents)) items))]
-          ;;   (printf "    = ~a: ~a\n" (@ kid title) (@ kid id)))
-          ))
+      ;; (let ((r (drive-list #:token t
+      ;;                     #:query `(in "root" parents))))
+      ;;  (for [(item (@ r items))]
+      ;;    (printf " - ~a: ~a\n" (@ item title) (@ item id))
+      ;;    ;; (for [(parent (@ item parents))]
+      ;;    ;;   (printf "    - ~a\n" (@ parent id)))
+      ;;    ;; (for [(kid (@ (drive-list #:token t #:query `(in ,(@ item id) parents)) items))]
+      ;;    ;;   (printf "    = ~a: ~a\n" (@ kid title) (@ kid id)))
+      ;;    ))
 
-      (pretty-print (drive-get "root" #:token t))
+      ;; (pretty-print (drive-get "root" #:token t))
 
       ;; (display
       ;;  (bytes->string/utf-8
